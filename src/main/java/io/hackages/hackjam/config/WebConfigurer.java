@@ -1,18 +1,28 @@
 package io.hackages.hackjam.config;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.servlet.InstrumentedFilter;
-import com.codahale.metrics.servlets.MetricsServlet;
-import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.JHipsterProperties;
-import io.github.jhipster.config.h2.H2ConfigurationHelper;
-import io.github.jhipster.web.filter.CachingHttpHeadersFilter;
-import io.undertow.UndertowOptions;
+import static java.net.URLDecoder.decode;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
-import org.springframework.boot.web.server.*;
+import org.springframework.boot.web.server.MimeMappings;
+import org.springframework.boot.web.server.WebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
@@ -23,14 +33,20 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.servlet.*;
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.*;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.servlet.InstrumentedFilter;
+import com.codahale.metrics.servlets.MetricsServlet;
 
-import static java.net.URLDecoder.decode;
+import io.github.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.JHipsterProperties;
+import io.github.jhipster.config.h2.H2ConfigurationHelper;
+import io.github.jhipster.web.filter.CachingHttpHeadersFilter;
+import io.hackages.hackjam.domain.Patient;
+import io.hackages.hackjam.service.dto.BecomePatientDTO;
+import io.hackages.hackjam.service.dto.PatientDTO;
+import io.hackages.hackjam.service.mapper.BecomePatientMapper;
+import io.hackages.hackjam.service.mapper.PatientMapper;
+import io.undertow.UndertowOptions;
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.
@@ -202,5 +218,66 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     @Autowired(required = false)
     public void setMetricRegistry(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
+    }
+    
+    @Bean
+    public PatientMapper setPatientMapper() {
+    	PatientMapper patientMapper = new PatientMapper() {
+			
+			@Override
+			public List<Patient> toEntity(List<PatientDTO> dtoList) {
+				List<Patient> lstPatient = new ArrayList<>();
+				dtoList.forEach(dto -> lstPatient.add(toEntity(dto)));
+				return lstPatient; 
+			}
+			
+			@Override
+			public Patient toEntity(PatientDTO dto) {
+				return new Patient(dto.getId(), dto.getName(), dto.getLocation(), dto.getAge(), dto.isAccepted());
+			}
+			
+			@Override
+			public List<PatientDTO> toDto(List<Patient> entityList) {
+				List<PatientDTO> lstPatientDTO = new ArrayList<>();
+				entityList.forEach(entity -> lstPatientDTO.add(toDto(entity)));
+				return lstPatientDTO; 
+			}
+			
+			@Override
+			public PatientDTO toDto(Patient entity) {
+				return new PatientDTO(entity.getId(), entity.getName(), entity.getLocation(), entity.getAge(), entity.isAccepted());
+			}
+		};
+        return patientMapper;
+    }
+    
+    @Bean
+    public BecomePatientMapper setBecomePatientMapper() {
+    	BecomePatientMapper becomePatientMapper = new BecomePatientMapper() {			
+			@Override
+			public List<Patient> toEntity(List<BecomePatientDTO> dtoList) {
+				List<Patient> lstPatient = new ArrayList<>();
+				dtoList.forEach(dto -> lstPatient.add(toEntity(dto)));
+				return lstPatient; 
+			}
+			
+			@Override
+			public List<BecomePatientDTO> toDto(List<Patient> entityList) {
+				List<BecomePatientDTO> lstBecomePatientDTO = new ArrayList<>();
+				entityList.forEach(entity -> lstBecomePatientDTO.add(toDto(entity)));
+				return lstBecomePatientDTO; 
+			}
+			
+			@Override
+			public BecomePatientDTO toDto(Patient entity) {
+				return new BecomePatientDTO(entity.getId(), entity.getName(), entity.getLocation(), entity.getAge(), entity.isAccepted());
+			}
+			
+			@Override
+			public Patient toEntity(BecomePatientDTO dto) {
+				return new Patient(dto.getId(), dto.getName(), dto.getLocation(), dto.getAge(), dto.isAccepted());
+			}
+		}; 
+        return becomePatientMapper;
     }
 }

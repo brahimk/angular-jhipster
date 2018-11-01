@@ -1,46 +1,51 @@
 package io.hackages.hackjam.service.impl;
 
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import io.hackages.hackjam.domain.Patient;
 import io.hackages.hackjam.repository.PatientRepository;
 import io.hackages.hackjam.service.PatientService;
 import io.hackages.hackjam.service.dto.BecomePatientDTO;
 import io.hackages.hackjam.service.dto.PatientDTO;
+import io.hackages.hackjam.service.mapper.BecomePatientMapper;
 import io.hackages.hackjam.service.mapper.PatientMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import java.util.Optional;
 
 /**
  * Service Implementation for managing Patient.
  */
 @Service
+@Component
 @Transactional
 public class PatientServiceImpl implements PatientService {
 
     private final Logger log = LoggerFactory.getLogger(PatientServiceImpl.class);
 
     @Autowired
-    @Qualifier("patientRepository")
     private PatientRepository patientRepository;
-
-    private PatientMapper patientMapper;
-
     
-    public PatientServiceImpl() {
-		super();
+    @Autowired(required=false)
+    private PatientMapper patientMapper;
+    
+    @Autowired(required=false)
+    private BecomePatientMapper becomePatientMapper;
+    
+	public PatientServiceImpl() {
+		
 	}
-
+    
 	public PatientServiceImpl(PatientRepository patientRepository, PatientMapper patientMapper) {
         this.patientRepository = patientRepository;
         this.patientMapper = patientMapper;
+        //this.becomePatientMapper = becomePatientMapper;
     }
 
     /**
@@ -59,10 +64,10 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public PatientDTO save(BecomePatientDTO becomePatientDTO) {
-        /**
-         * Implement the saving of a becomePatientDTO using the becomePatientMapper.toEntity
-         */
-        throw new NotImplementedException();
+        log.debug("Request to save Patient : {}", becomePatientDTO);
+        Patient patient = becomePatientMapper.toEntity(becomePatientDTO);
+        patient = patientRepository.save(patient);
+        return patientMapper.toDto(patient);
     }
 
     /**

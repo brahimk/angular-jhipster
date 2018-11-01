@@ -31,8 +31,21 @@ public class Patient implements Serializable {
 
     @Column(name = "accepted")
     private Boolean accepted;
+        
+    public Patient() {
+		super();
+	}
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
+	public Patient(Long id, String name, String location, Integer age, Boolean accepted) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.location = location;
+		this.age = age;
+		this.accepted = accepted;
+	}
+
+	// jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
     }

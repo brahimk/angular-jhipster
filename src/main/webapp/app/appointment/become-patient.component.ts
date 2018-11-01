@@ -79,20 +79,39 @@ export class BecomePatientComponent implements OnInit {
         this.isSaving = false;
     }
 
+    console(val) {
+        console.log(val);
+    }
+
     save() {
         debugger;
         this.isSaving = true;
-        this.becomePatientService.save(this.becomePatientForm.getRawValue()).pipe(
+
+        this.becomePatientService
+            .save(this.becomePatientForm.getRawValue())
+            .subscribe(response => this.onSaveSuccess(response), () => this.onSaveError());
+
+        /*this.becomePatientService.save(this.becomePatientForm.getRawValue()).pipe(
             map(response => {
                 // to get a new csrf token call the api
                 console.log('Je suis un super !!');
                 return response;
             }),
-            catchError(val => `I caught: ${val}`)
+            catchError(val => this.console(`I caught: ${val}`))
         );
 
         /**
          * Inject BecomePatientService and save the patient
          */
+    }
+
+    private onSaveSuccess(result) {
+        this.isSaving = false;
+        this.console('Je suis bonnnnn');
+    }
+
+    private onSaveError() {
+        this.isSaving = false;
+        this.console('Je suis nulllllleee');
     }
 }

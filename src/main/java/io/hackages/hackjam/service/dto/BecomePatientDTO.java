@@ -23,7 +23,22 @@ public class BecomePatientDTO implements Serializable {
 
     private Boolean accepted;
 
-    public Long getId() {
+    
+    public BecomePatientDTO() {
+		super();
+	}
+    
+	public BecomePatientDTO(Long id, String name, String location, Integer age, Boolean accepted) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.location = location;
+		this.age = age;
+		this.accepted = accepted;
+	}
+
+
+	public Long getId() {
         return id;
     }
 
@@ -86,7 +101,7 @@ public class BecomePatientDTO implements Serializable {
             "}";
     }
 
-	public Boolean getAccepted() {
+	public Boolean isAccepted() {
 		return accepted;
 	}
 
