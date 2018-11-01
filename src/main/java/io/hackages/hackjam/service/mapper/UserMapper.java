@@ -4,10 +4,10 @@ import io.hackages.hackjam.domain.Authority;
 import io.hackages.hackjam.domain.User;
 import io.hackages.hackjam.service.dto.UserDTO;
 
-import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
 
 /**
  * Mapper for the entity User and its DTO called UserDTO.
@@ -23,10 +23,7 @@ public class UserMapper {
     }
 
     public List<UserDTO> usersToUserDTOs(List<User> users) {
-        return users.stream()
-            .filter(Objects::nonNull)
-            .map(this::userToUserDTO)
-            .collect(Collectors.toList());
+        return users.stream().filter(Objects::nonNull).map(this::userToUserDTO).collect(Collectors.toList());
     }
 
     public User userDTOToUser(UserDTO userDTO) {
@@ -51,10 +48,7 @@ public class UserMapper {
     }
 
     public List<User> userDTOsToUsers(List<UserDTO> userDTOs) {
-        return userDTOs.stream()
-            .filter(Objects::nonNull)
-            .map(this::userDTOToUser)
-            .collect(Collectors.toList());
+        return userDTOs.stream().filter(Objects::nonNull).map(this::userDTOToUser).collect(Collectors.toList());
     }
 
     public User userFromId(Long id) {
@@ -67,10 +61,14 @@ public class UserMapper {
     }
 
     public Set<Authority> authoritiesFromStrings(Set<String> strings) {
-        return strings.stream().map(string -> {
-            Authority auth = new Authority();
-            auth.setName(string);
-            return auth;
-        }).collect(Collectors.toSet());
+        return strings.stream().map(
+            string -> {
+                Authority auth = new Authority();
+                auth.setName(string);
+                return auth;
+            }
+        ).collect(Collectors.toSet());
     }
+
 }
+

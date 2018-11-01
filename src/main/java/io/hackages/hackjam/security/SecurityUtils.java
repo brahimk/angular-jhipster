@@ -1,18 +1,17 @@
 package io.hackages.hackjam.security;
 
+import java.util.Optional;
+
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Optional;
 
 /**
  * Utility class for Spring Security.
  */
 public final class SecurityUtils {
 
-    private SecurityUtils() {
-    }
+    private SecurityUtils() {}
 
     /**
      * Get the login of the current user.
@@ -21,8 +20,8 @@ public final class SecurityUtils {
      */
     public static Optional<String> getCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional.ofNullable(securityContext.getAuthentication())
-            .map(authentication -> {
+        return Optional.ofNullable(securityContext.getAuthentication()).map(
+            authentication -> {
                 if (authentication.getPrincipal() instanceof UserDetails) {
                     UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
                     return springSecurityUser.getUsername();
@@ -30,7 +29,8 @@ public final class SecurityUtils {
                     return (String) authentication.getPrincipal();
                 }
                 return null;
-            });
+            }
+        );
     }
 
     /**
@@ -40,10 +40,11 @@ public final class SecurityUtils {
      */
     public static boolean isAuthenticated() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional.ofNullable(securityContext.getAuthentication())
-            .map(authentication -> authentication.getAuthorities().stream()
-                .noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(AuthoritiesConstants.ANONYMOUS)))
-            .orElse(false);
+        return Optional.ofNullable(securityContext.getAuthentication()).map(
+            authentication -> authentication.getAuthorities().stream().noneMatch(
+                grantedAuthority -> grantedAuthority.getAuthority().equals(AuthoritiesConstants.ANONYMOUS)
+            )
+        ).orElse(false);
     }
 
     /**
@@ -56,9 +57,12 @@ public final class SecurityUtils {
      */
     public static boolean isCurrentUserInRole(String authority) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional.ofNullable(securityContext.getAuthentication())
-            .map(authentication -> authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority)))
-            .orElse(false);
+        return Optional.ofNullable(securityContext.getAuthentication()).map(
+            authentication -> authentication.getAuthorities().stream().anyMatch(
+                grantedAuthority -> grantedAuthority.getAuthority().equals(authority)
+            )
+        ).orElse(false);
     }
+
 }
+

@@ -6,11 +6,9 @@ import org.apache.commons.lang3.RandomStringUtils;
  * Utility class for generating random Strings.
  */
 public final class RandomUtil {
-
     private static final int DEF_COUNT = 20;
 
-    private RandomUtil() {
-    }
+    private RandomUtil() {}
 
     /**
      * Generate a password.
@@ -57,4 +55,6 @@ public final class RandomUtil {
     public static String generateTokenData() {
         return RandomStringUtils.randomAlphanumeric(DEF_COUNT);
     }
+
 }
+

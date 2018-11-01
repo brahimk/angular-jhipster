@@ -2,14 +2,15 @@ package io.hackages.hackjam.service.mapper;
 
 import io.hackages.hackjam.domain.Patient;
 import io.hackages.hackjam.service.dto.BecomePatientDTO;
+
 import org.mapstruct.Mapper;
 
 /**
  * Mapper for the entity Patient and its DTO BecomePatientDTO.
  */
-@Mapper(componentModel = "spring", uses = {})
-public interface BecomePatientMapper extends EntityMapper<BecomePatientDTO, Patient> {
-
+@Mapper(componentModel = "spring", uses = {  })
+public interface BecomePatientMapper
+    extends EntityMapper<BecomePatientDTO, Patient> {
 
     @Override
     /**
@@ -25,4 +26,6 @@ public interface BecomePatientMapper extends EntityMapper<BecomePatientDTO, Pati
         patient.setId(id);
         return patient;
     }
+
 }
+

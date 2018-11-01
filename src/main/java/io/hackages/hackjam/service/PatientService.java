@@ -3,10 +3,10 @@ package io.hackages.hackjam.service;
 import io.hackages.hackjam.service.dto.BecomePatientDTO;
 import io.hackages.hackjam.service.dto.PatientDTO;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Optional;
 
 /**
  * Service Interface for managing Patient.
@@ -37,7 +37,6 @@ public interface PatientService {
      */
     Page<PatientDTO> findAll(Pageable pageable);
 
-
     /**
      * Get the "id" patient.
      *
@@ -52,4 +51,6 @@ public interface PatientService {
      * @param id the id of the entity
      */
     void delete(Long id);
+
 }
+

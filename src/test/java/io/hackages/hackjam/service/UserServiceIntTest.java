@@ -9,6 +9,13 @@ import io.hackages.hackjam.repository.UserRepository;
 import io.hackages.hackjam.service.dto.UserDTO;
 import io.hackages.hackjam.service.util.RandomUtil;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,15 +30,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.mockito.Mockito.when;
 
 /**
@@ -43,7 +42,6 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = HackjamJhipsterApp.class)
 @Transactional
 public class UserServiceIntTest {
-
     @Autowired
     private PersistentTokenRepository persistentTokenRepository;
 
@@ -201,11 +199,8 @@ public class UserServiceIntTest {
         }
         final PageRequest pageable = PageRequest.of(0, (int) userRepository.count());
         final Page<UserDTO> allManagedUsers = userService.getAllManagedUsers(pageable);
-        assertThat(allManagedUsers.getContent().stream()
-            .noneMatch(user -> Constants.ANONYMOUS_USER.equals(user.getLogin())))
-            .isTrue();
+        assertThat(allManagedUsers.getContent().stream().noneMatch(user -> Constants.ANONYMOUS_USER.equals(user.getLogin()))).isTrue();
     }
-
 
     @Test
     @Transactional
@@ -222,3 +217,4 @@ public class UserServiceIntTest {
     }
 
 }
+

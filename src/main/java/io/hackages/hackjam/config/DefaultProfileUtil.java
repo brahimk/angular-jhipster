@@ -2,10 +2,10 @@ package io.hackages.hackjam.config;
 
 import io.github.jhipster.config.JHipsterConstants;
 
+import java.util.*;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.Environment;
-
-import java.util.*;
 
 /**
  * Utility class to load a Spring profile to be used as default
@@ -13,11 +13,9 @@ import java.util.*;
  * If the value is not available in <code>application.yml</code> then <code>dev</code> profile will be used as default.
  */
 public final class DefaultProfileUtil {
-
     private static final String SPRING_PROFILE_DEFAULT = "spring.profiles.default";
 
-    private DefaultProfileUtil() {
-    }
+    private DefaultProfileUtil() {}
 
     /**
      * Set a default to use when no profile is configured.
@@ -48,4 +46,6 @@ public final class DefaultProfileUtil {
         }
         return profiles;
     }
+
 }
+

@@ -1,11 +1,12 @@
 package io.hackages.hackjam.domain;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  * Persist AuditEvent managed by the Spring Boot actuator.
@@ -15,17 +16,16 @@ import java.util.Map;
 @Entity
 @Table(name = "jhi_persistent_audit_event")
 public class PersistentAuditEvent implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
     @Column(name = "event_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @Id
+    @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
-    @NotNull
     @Column(nullable = false)
+    @NotNull
     private String principal;
 
     @Column(name = "event_date")
@@ -34,10 +34,14 @@ public class PersistentAuditEvent implements Serializable {
     @Column(name = "event_type")
     private String auditEventType;
 
+    @CollectionTable(
+        name = "jhi_persistent_audit_evt_data",
+        joinColumns = @JoinColumn(name = "event_id")
+
+    )
+    @Column(name = "value")
     @ElementCollection
     @MapKeyColumn(name = "name")
-    @Column(name = "value")
-    @CollectionTable(name = "jhi_persistent_audit_evt_data", joinColumns=@JoinColumn(name="event_id"))
     private Map<String, String> data = new HashMap<>();
 
     public Long getId() {
@@ -79,4 +83,6 @@ public class PersistentAuditEvent implements Serializable {
     public void setData(Map<String, String> data) {
         this.data = data;
     }
+
 }
+

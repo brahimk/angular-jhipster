@@ -1,13 +1,14 @@
 package io.hackages.hackjam.web.rest.vm;
 
 import io.hackages.hackjam.service.dto.UserDTO;
+
 import javax.validation.constraints.Size;
 
 /**
  * View Model extending the UserDTO, which is meant to be used in the user management UI.
  */
-public class ManagedUserVM extends UserDTO {
-
+public class ManagedUserVM
+    extends UserDTO {
     public static final int PASSWORD_MIN_LENGTH = 4;
 
     public static final int PASSWORD_MAX_LENGTH = 100;
@@ -15,9 +16,8 @@ public class ManagedUserVM extends UserDTO {
     @Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH)
     private String password;
 
-    public ManagedUserVM() {
-        // Empty constructor needed for Jackson.
-    }
+    public ManagedUserVM() // Empty constructor needed for Jackson.
+    {}
 
     public String getPassword() {
         return password;
@@ -29,7 +29,8 @@ public class ManagedUserVM extends UserDTO {
 
     @Override
     public String toString() {
-        return "ManagedUserVM{" +
-            "} " + super.toString();
+        return "ManagedUserVM{" + "} " + super.toString();
     }
+
 }
+

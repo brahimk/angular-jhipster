@@ -1,13 +1,13 @@
 package io.hackages.hackjam.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serializable;
 import java.time.LocalDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-
 
 /**
  * Persistent tokens are used by Spring Security to automatically log in users.
@@ -17,7 +17,6 @@ import java.io.Serializable;
 @Entity
 @Table(name = "jhi_persistent_token")
 public class PersistentToken implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     private static final int MAX_USER_AGENT_LEN = 255;
@@ -25,11 +24,11 @@ public class PersistentToken implements Serializable {
     @Id
     private String series;
 
+    @Column(name = "token_value", nullable = false)
     @JsonIgnore
     @NotNull
-    @Column(name = "token_value", nullable = false)
     private String tokenValue;
-    
+
     @Column(name = "token_date")
     private LocalDate tokenDate;
 
@@ -40,7 +39,6 @@ public class PersistentToken implements Serializable {
 
     @Column(name = "user_agent")
     private String userAgent;
-        
 
     @JsonIgnore
     @ManyToOne
@@ -106,13 +104,11 @@ public class PersistentToken implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         PersistentToken that = (PersistentToken) o;
 
         if (!series.equals(that.series)) {
             return false;
         }
-
         return true;
     }
 
@@ -123,12 +119,12 @@ public class PersistentToken implements Serializable {
 
     @Override
     public String toString() {
-        return "PersistentToken{" +
-            "series='" + series + '\'' +
+        return "PersistentToken{" + "series='" + series + '\'' +
             ", tokenValue='" + tokenValue + '\'' +
             ", tokenDate=" + tokenDate +
             ", ipAddress='" + ipAddress + '\'' +
-            ", userAgent='" + userAgent + '\'' +
-            "}";
+            ", userAgent='" + userAgent + '\'' + "}";
     }
+
 }
+

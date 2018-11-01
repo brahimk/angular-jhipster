@@ -1,8 +1,7 @@
 package io.hackages.hackjam.config;
 
-import io.hackages.hackjam.aop.logging.LoggingAspect;
-
 import io.github.jhipster.config.JHipsterConstants;
+import io.hackages.hackjam.aop.logging.LoggingAspect;
 
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
@@ -16,4 +15,6 @@ public class LoggingAspectConfiguration {
     public LoggingAspect loggingAspect(Environment env) {
         return new LoggingAspect(env);
     }
+
 }
+

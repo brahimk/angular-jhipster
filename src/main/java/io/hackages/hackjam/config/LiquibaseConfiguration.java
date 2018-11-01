@@ -1,6 +1,11 @@
 package io.hackages.hackjam.config;
 
+import io.github.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.liquibase.AsyncSpringLiquibase;
+
 import javax.sql.DataSource;
+
+import liquibase.integration.spring.SpringLiquibase;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,26 +16,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 
-import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.liquibase.AsyncSpringLiquibase;
-import liquibase.integration.spring.SpringLiquibase;
-
 @Configuration
 public class LiquibaseConfiguration {
-
     private final Logger log = LoggerFactory.getLogger(LiquibaseConfiguration.class);
 
     private final Environment env;
-
 
     public LiquibaseConfiguration(Environment env) {
         this.env = env;
     }
 
     @Bean
-    public SpringLiquibase liquibase(@Qualifier("taskExecutor") TaskExecutor taskExecutor,
-            DataSource dataSource, LiquibaseProperties liquibaseProperties) {
-
+    public SpringLiquibase liquibase(
+        @Qualifier("taskExecutor")
+        TaskExecutor taskExecutor,
+        DataSource dataSource,
+        LiquibaseProperties liquibaseProperties
+    ) {
         // Use liquibase.integration.spring.SpringLiquibase if you don't want Liquibase to start asynchronously
         SpringLiquibase liquibase = new AsyncSpringLiquibase(taskExecutor, env);
         liquibase.setDataSource(dataSource);
@@ -47,4 +49,6 @@ public class LiquibaseConfiguration {
         }
         return liquibase;
     }
+
 }
+

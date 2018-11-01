@@ -1,15 +1,16 @@
 package io.hackages.hackjam.web.rest.errors;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class ExceptionTranslatorTestController {
@@ -20,8 +21,11 @@ public class ExceptionTranslatorTestController {
     }
 
     @PostMapping("/test/method-argument")
-    public void methodArgument(@Valid @RequestBody TestDTO testDTO) {
-    }
+    public void methodArgument(
+        @RequestBody
+        @Valid
+        TestDTO testDTO
+    ) {}
 
     @GetMapping("/test/parameterized-error")
     public void parameterizedError() {
@@ -37,12 +41,16 @@ public class ExceptionTranslatorTestController {
     }
 
     @GetMapping("/test/missing-servlet-request-part")
-    public void missingServletRequestPartException(@RequestPart String part) {
-    }
+    public void missingServletRequestPartException(
+        @RequestPart
+        String part
+    ) {}
 
     @GetMapping("/test/missing-servlet-request-parameter")
-    public void missingServletRequestParameterException(@RequestParam String param) {
-    }
+    public void missingServletRequestParameterException(
+        @RequestParam
+        String param
+    ) {}
 
     @GetMapping("/test/access-denied")
     public void accessdenied() {
@@ -65,7 +73,6 @@ public class ExceptionTranslatorTestController {
     }
 
     public static class TestDTO {
-
         @NotNull
         private String test;
 
@@ -76,11 +83,13 @@ public class ExceptionTranslatorTestController {
         public void setTest(String test) {
             this.test = test;
         }
+
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "test response status")
     @SuppressWarnings("serial")
-    public static class TestResponseStatusException extends RuntimeException {
-    }
+    public static class TestResponseStatusException
+        extends RuntimeException {}
 
 }
+

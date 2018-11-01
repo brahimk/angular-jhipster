@@ -1,9 +1,11 @@
 package io.hackages.hackjam.web.rest;
 
-import io.hackages.hackjam.HackjamJhipsterApp;
-import io.hackages.hackjam.web.rest.vm.LoggerVM;
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.LoggerContext;
+
+import io.hackages.hackjam.HackjamJhipsterApp;
+import io.hackages.hackjam.web.rest.vm.LoggerVM;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,22 +30,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = HackjamJhipsterApp.class)
 public class LogsResourceIntTest {
-
     private MockMvc restLogsMockMvc;
 
     @Before
     public void setup() {
         LogsResource logsResource = new LogsResource();
-        this.restLogsMockMvc = MockMvcBuilders
-            .standaloneSetup(logsResource)
-            .build();
+        this.restLogsMockMvc = MockMvcBuilders.standaloneSetup(logsResource).build();
     }
 
     @Test
     public void getAllLogs() throws Exception {
-        restLogsMockMvc.perform(get("/management/logs"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+        restLogsMockMvc.perform(get("/management/logs")).andExpect(status().isOk()).andExpect(
+            content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        );
     }
 
     @Test
@@ -52,10 +51,9 @@ public class LogsResourceIntTest {
         logger.setLevel("INFO");
         logger.setName("ROOT");
 
-        restLogsMockMvc.perform(put("/management/logs")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(logger)))
-            .andExpect(status().isNoContent());
+        restLogsMockMvc.perform(
+            put("/management/logs").contentType(TestUtil.APPLICATION_JSON_UTF8).content(TestUtil.convertObjectToJsonBytes(logger))
+        ).andExpect(status().isNoContent());
     }
 
     @Test
@@ -63,4 +61,6 @@ public class LogsResourceIntTest {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         assertThat(context.getLogger("ROOT").getAppender("ASYNC_LOGSTASH")).isInstanceOf(AsyncAppender.class);
     }
+
 }
+

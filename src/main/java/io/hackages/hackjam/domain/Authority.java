@@ -1,12 +1,13 @@
 package io.hackages.hackjam.domain;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 
 /**
  * An authority (a security role) used by Spring Security.
@@ -14,13 +15,12 @@ import java.io.Serializable;
 @Entity
 @Table(name = "jhi_authority")
 public class Authority implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
+    @Column(length = 50)
+    @Id
     @NotNull
     @Size(max = 50)
-    @Id
-    @Column(length = 50)
     private String name;
 
     public String getName() {
@@ -39,7 +39,6 @@ public class Authority implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         Authority authority = (Authority) o;
 
         return !(name != null ? !name.equals(authority.name) : authority.name != null);
@@ -52,8 +51,8 @@ public class Authority implements Serializable {
 
     @Override
     public String toString() {
-        return "Authority{" +
-            "name='" + name + '\'' +
-            "}";
+        return "Authority{" + "name='" + name + '\'' + "}";
     }
+
 }
+

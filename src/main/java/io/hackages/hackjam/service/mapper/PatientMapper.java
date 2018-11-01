@@ -8,10 +8,9 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity Patient and its DTO PatientDTO.
  */
-@Mapper(componentModel = "spring", uses = {})
-public interface PatientMapper extends EntityMapper<PatientDTO, Patient> {
-
-
+@Mapper(componentModel = "spring", uses = {  })
+public interface PatientMapper
+    extends EntityMapper<PatientDTO, Patient> {
 
     default Patient fromId(Long id) {
         if (id == null) {
@@ -21,4 +20,6 @@ public interface PatientMapper extends EntityMapper<PatientDTO, Patient> {
         patient.setId(id);
         return patient;
     }
+
 }
+

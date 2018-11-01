@@ -1,23 +1,21 @@
 package io.hackages.hackjam.service.dto;
 
 import io.hackages.hackjam.config.Constants;
-
 import io.hackages.hackjam.domain.Authority;
 import io.hackages.hackjam.domain.User;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-
-import javax.validation.constraints.*;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 /**
  * A DTO representing a user, with his authorities.
  */
 public class UserDTO {
-
     private Long id;
 
     @NotBlank
@@ -53,9 +51,8 @@ public class UserDTO {
 
     private Set<String> authorities;
 
-    public UserDTO() {
-        // Empty constructor needed for Jackson.
-    }
+    public UserDTO() // Empty constructor needed for Jackson.
+    {}
 
     public UserDTO(User user) {
         this.id = user.getId();
@@ -70,9 +67,7 @@ public class UserDTO {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
-        this.authorities = user.getAuthorities().stream()
-            .map(Authority::getName)
-            .collect(Collectors.toSet());
+        this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
     }
 
     public Long getId() {
@@ -181,8 +176,7 @@ public class UserDTO {
 
     @Override
     public String toString() {
-        return "UserDTO{" +
-            "login='" + login + '\'' +
+        return "UserDTO{" + "login='" + login + '\'' +
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
@@ -191,9 +185,8 @@ public class UserDTO {
             ", langKey='" + langKey + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +
-            ", lastModifiedBy='" + lastModifiedBy + '\'' +
-            ", lastModifiedDate=" + lastModifiedDate +
-            ", authorities=" + authorities +
-            "}";
+            ", lastModifiedBy='" + lastModifiedBy + '\'' + ", lastModifiedDate=" + lastModifiedDate + ", authorities=" + authorities + "}";
     }
+
 }
+

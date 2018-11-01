@@ -1,6 +1,19 @@
 package io.hackages.hackjam.config;
 
-import static java.net.URLDecoder.decode;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.servlet.InstrumentedFilter;
+import com.codahale.metrics.servlets.MetricsServlet;
+
+import io.github.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.JHipsterProperties;
+import io.github.jhipster.config.h2.H2ConfigurationHelper;
+import io.github.jhipster.web.filter.CachingHttpHeadersFilter;
+import io.hackages.hackjam.domain.Patient;
+import io.hackages.hackjam.service.dto.BecomePatientDTO;
+import io.hackages.hackjam.service.dto.PatientDTO;
+import io.hackages.hackjam.service.mapper.BecomePatientMapper;
+import io.hackages.hackjam.service.mapper.PatientMapper;
+import io.undertow.UndertowOptions;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -33,27 +46,13 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.servlet.InstrumentedFilter;
-import com.codahale.metrics.servlets.MetricsServlet;
-
-import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.JHipsterProperties;
-import io.github.jhipster.config.h2.H2ConfigurationHelper;
-import io.github.jhipster.web.filter.CachingHttpHeadersFilter;
-import io.hackages.hackjam.domain.Patient;
-import io.hackages.hackjam.service.dto.BecomePatientDTO;
-import io.hackages.hackjam.service.dto.PatientDTO;
-import io.hackages.hackjam.service.mapper.BecomePatientMapper;
-import io.hackages.hackjam.service.mapper.PatientMapper;
-import io.undertow.UndertowOptions;
+import static java.net.URLDecoder.decode;
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.
  */
 @Configuration
 public class WebConfigurer implements ServletContextInitializer, WebServerFactoryCustomizer<WebServerFactory> {
-
     private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
 
     private final Environment env;
@@ -63,7 +62,6 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     private MetricRegistry metricRegistry;
 
     public WebConfigurer(Environment env, JHipsterProperties jHipsterProperties) {
-
         this.env = env;
         this.jHipsterProperties = jHipsterProperties;
     }
@@ -92,19 +90,19 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         setMimeMappings(server);
         // When running in an IDE or with ./gradlew bootRun, set location of the static web assets.
         setLocationForStaticAssets(server);
-
         /*
          * Enable HTTP/2 for Undertow - https://twitter.com/ankinson/status/829256167700492288
          * HTTP/2 requires HTTPS, so HTTP requests will fallback to HTTP/1.1.
          * See the JHipsterProperties class and your application-*.yml configuration files
          * for more information.
          */
-        if (jHipsterProperties.getHttp().getVersion().equals(JHipsterProperties.Http.Version.V_2_0) &&
-            server instanceof UndertowServletWebServerFactory) {
 
-            ((UndertowServletWebServerFactory) server)
-                .addBuilderCustomizers(builder ->
-                    builder.setServerOption(UndertowOptions.ENABLE_HTTP2, true));
+        if (jHipsterProperties.getHttp().getVersion().equals(
+            JHipsterProperties.Http.Version.V_2_0
+        ) && server instanceof UndertowServletWebServerFactory) {
+            ((UndertowServletWebServerFactory) server).addBuilderCustomizers(
+                builder -> builder.setServerOption(UndertowOptions.ENABLE_HTTP2, true)
+            );
         }
     }
 
@@ -139,7 +137,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         String fullExecutablePath;
         try {
             fullExecutablePath = decode(this.getClass().getResource("").getPath(), StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
+        } catch(UnsupportedEncodingException e) {
             /* try without decoding if this ever happens */
             fullExecutablePath = this.getClass().getResource("").getPath();
         }
@@ -155,13 +153,12 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     /**
      * Initializes the caching HTTP Headers Filter.
      */
-    private void initCachingHttpHeadersFilter(ServletContext servletContext,
-                                              EnumSet<DispatcherType> disps) {
+    private void initCachingHttpHeadersFilter(ServletContext servletContext, EnumSet<DispatcherType> disps) {
         log.debug("Registering Caching HTTP Headers Filter");
-        FilterRegistration.Dynamic cachingHttpHeadersFilter =
-            servletContext.addFilter("cachingHttpHeadersFilter",
-                new CachingHttpHeadersFilter(jHipsterProperties));
-
+        FilterRegistration.Dynamic cachingHttpHeadersFilter = servletContext.addFilter(
+            "cachingHttpHeadersFilter",
+            new CachingHttpHeadersFilter(jHipsterProperties)
+        );
         cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/i18n/*");
         cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/content/*");
         cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/app/*");
@@ -173,22 +170,16 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
      */
     private void initMetrics(ServletContext servletContext, EnumSet<DispatcherType> disps) {
         log.debug("Initializing Metrics registries");
-        servletContext.setAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE,
-            metricRegistry);
-        servletContext.setAttribute(MetricsServlet.METRICS_REGISTRY,
-            metricRegistry);
+        servletContext.setAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE, metricRegistry);
+        servletContext.setAttribute(MetricsServlet.METRICS_REGISTRY, metricRegistry);
 
         log.debug("Registering Metrics Filter");
-        FilterRegistration.Dynamic metricsFilter = servletContext.addFilter("webappMetricsFilter",
-            new InstrumentedFilter());
-
+        FilterRegistration.Dynamic metricsFilter = servletContext.addFilter("webappMetricsFilter", new InstrumentedFilter());
         metricsFilter.addMappingForUrlPatterns(disps, true, "/*");
         metricsFilter.setAsyncSupported(true);
 
         log.debug("Registering Metrics Servlet");
-        ServletRegistration.Dynamic metricsAdminServlet =
-            servletContext.addServlet("metricsServlet", new MetricsServlet());
-
+        ServletRegistration.Dynamic metricsAdminServlet = servletContext.addServlet("metricsServlet", new MetricsServlet());
         metricsAdminServlet.addMapping("/management/metrics/*");
         metricsAdminServlet.setAsyncSupported(true);
         metricsAdminServlet.setLoadOnStartup(2);
@@ -219,65 +210,70 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     public void setMetricRegistry(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
     }
-    
+
     @Bean
     public PatientMapper setPatientMapper() {
-    	PatientMapper patientMapper = new PatientMapper() {
-			
-			@Override
-			public List<Patient> toEntity(List<PatientDTO> dtoList) {
-				List<Patient> lstPatient = new ArrayList<>();
-				dtoList.forEach(dto -> lstPatient.add(toEntity(dto)));
-				return lstPatient; 
-			}
-			
-			@Override
-			public Patient toEntity(PatientDTO dto) {
-				return new Patient(dto.getId(), dto.getName(), dto.getLocation(), dto.getAge(), dto.isAccepted());
-			}
-			
-			@Override
-			public List<PatientDTO> toDto(List<Patient> entityList) {
-				List<PatientDTO> lstPatientDTO = new ArrayList<>();
-				entityList.forEach(entity -> lstPatientDTO.add(toDto(entity)));
-				return lstPatientDTO; 
-			}
-			
-			@Override
-			public PatientDTO toDto(Patient entity) {
-				return new PatientDTO(entity.getId(), entity.getName(), entity.getLocation(), entity.getAge(), entity.isAccepted());
-			}
-		};
+        PatientMapper patientMapper = new PatientMapper() {
+
+            @Override
+            public List<Patient> toEntity(List<PatientDTO> dtoList) {
+                List<Patient> lstPatient = new ArrayList<>();
+                dtoList.forEach(dto -> lstPatient.add(toEntity(dto)));
+                return lstPatient;
+            }
+
+            @Override
+            public Patient toEntity(PatientDTO dto) {
+                return new Patient(dto.getId(), dto.getName(), dto.getLocation(), dto.getAge(), dto.isAccepted());
+            }
+
+            @Override
+            public List<PatientDTO> toDto(List<Patient> entityList) {
+                List<PatientDTO> lstPatientDTO = new ArrayList<>();
+                entityList.forEach(entity -> lstPatientDTO.add(toDto(entity)));
+                return lstPatientDTO;
+            }
+
+            @Override
+            public PatientDTO toDto(Patient entity) {
+                return new PatientDTO(entity.getId(), entity.getName(), entity.getLocation(), entity.getAge(), entity.isAccepted());
+            }
+
+        };
         return patientMapper;
     }
-    
+
     @Bean
     public BecomePatientMapper setBecomePatientMapper() {
-    	BecomePatientMapper becomePatientMapper = new BecomePatientMapper() {			
-			@Override
-			public List<Patient> toEntity(List<BecomePatientDTO> dtoList) {
-				List<Patient> lstPatient = new ArrayList<>();
-				dtoList.forEach(dto -> lstPatient.add(toEntity(dto)));
-				return lstPatient; 
-			}
-			
-			@Override
-			public List<BecomePatientDTO> toDto(List<Patient> entityList) {
-				List<BecomePatientDTO> lstBecomePatientDTO = new ArrayList<>();
-				entityList.forEach(entity -> lstBecomePatientDTO.add(toDto(entity)));
-				return lstBecomePatientDTO; 
-			}
-			
-			@Override
-			public BecomePatientDTO toDto(Patient entity) {
-				return new BecomePatientDTO(entity.getId(), entity.getName(), entity.getLocation(), entity.getAge(), entity.isAccepted());
-			}
-			
-			@Override
-			public Patient toEntity(BecomePatientDTO dto) {
-				return new Patient(dto.getId(), dto.getName(), dto.getLocation(), dto.getAge(), dto.isAccepted());
-			}
-		}; 
+        BecomePatientMapper becomePatientMapper = new BecomePatientMapper() {
+
+            @Override
+            public List<Patient> toEntity(List<BecomePatientDTO> dtoList) {
+                List<Patient> lstPatient = new ArrayList<>();
+                dtoList.forEach(dto -> lstPatient.add(toEntity(dto)));
+                return lstPatient;
+            }
+
+            @Override
+            public List<BecomePatientDTO> toDto(List<Patient> entityList) {
+                List<BecomePatientDTO> lstBecomePatientDTO = new ArrayList<>();
+                entityList.forEach(entity -> lstBecomePatientDTO.add(toDto(entity)));
+                return lstBecomePatientDTO;
+            }
+
+            @Override
+            public BecomePatientDTO toDto(Patient entity) {
+                return new BecomePatientDTO(entity.getId(), entity.getName(), entity.getLocation(), entity.getAge(), entity.isAccepted());
+            }
+
+            @Override
+            public Patient toEntity(BecomePatientDTO dto) {
+                return new Patient(dto.getId(), dto.getName(), dto.getLocation(), dto.getAge(), dto.isAccepted());
+            }
+
+        };
         return becomePatientMapper;
     }
+
 }
+

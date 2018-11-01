@@ -1,13 +1,18 @@
 package io.hackages.hackjam.security;
 
+import io.github.jhipster.config.JHipsterProperties;
+import io.github.jhipster.security.PersistentTokenCache;
 import io.hackages.hackjam.domain.PersistentToken;
 import io.hackages.hackjam.repository.PersistentTokenRepository;
 import io.hackages.hackjam.repository.UserRepository;
 import io.hackages.hackjam.service.util.RandomUtil;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.*;
 
-import io.github.jhipster.config.JHipsterProperties;
-import io.github.jhipster.security.PersistentTokenCache;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +22,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.rememberme.*;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.*;
 
 /**
  * Custom implementation of Spring Security's RememberMeServices.
@@ -52,9 +51,8 @@ import java.util.*;
  * couldn't be cleanly extended.
  */
 @Service
-public class PersistentTokenRememberMeServices extends
-    AbstractRememberMeServices {
-
+public class PersistentTokenRememberMeServices
+    extends AbstractRememberMeServices {
     private final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
 
     // Token is valid for one month
@@ -70,10 +68,12 @@ public class PersistentTokenRememberMeServices extends
 
     private final UserRepository userRepository;
 
-    public PersistentTokenRememberMeServices(JHipsterProperties jHipsterProperties,
-            org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
-            PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
-
+    public PersistentTokenRememberMeServices(
+        JHipsterProperties jHipsterProperties,
+        org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
+        PersistentTokenRepository persistentTokenRepository,
+        UserRepository userRepository
+    ) {
         super(jHipsterProperties.getSecurity().getRememberMe().getKey(), userDetailsService);
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
@@ -81,17 +81,15 @@ public class PersistentTokenRememberMeServices extends
     }
 
     @Override
-    protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
-        HttpServletResponse response) {
-
-        synchronized (this) { // prevent 2 authentication requests from the same user in parallel
+    protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
+        synchronized (this) {
+            // prevent 2 authentication requests from the same user in parallel
             String login = null;
             UpgradedRememberMeToken upgradedToken = upgradedTokenCache.get(cookieTokens[0]);
             if (upgradedToken != null) {
                 login = upgradedToken.getUserLoginIfValid(cookieTokens);
                 log.debug("Detected previously upgraded login token for user '{}'", login);
             }
-
             if (login == null) {
                 PersistentToken token = getPersistentToken(cookieTokens);
                 login = token.getUser().getLogin();
@@ -104,7 +102,7 @@ public class PersistentTokenRememberMeServices extends
                 token.setUserAgent(request.getHeader("User-Agent"));
                 try {
                     persistentTokenRepository.saveAndFlush(token);
-                } catch (DataAccessException e) {
+                } catch(DataAccessException e) {
                     log.error("Failed to update token: ", e);
                     throw new RememberMeAuthenticationException("Autologin failed due to data access problem", e);
                 }
@@ -116,26 +114,26 @@ public class PersistentTokenRememberMeServices extends
     }
 
     @Override
-    protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication
-        successfulAuthentication) {
-
+    protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
         String login = successfulAuthentication.getName();
 
         log.debug("Creating new persistent login for user {}", login);
-        PersistentToken token = userRepository.findOneByLogin(login).map(u -> {
-            PersistentToken t = new PersistentToken();
-            t.setSeries(RandomUtil.generateSeriesData());
-            t.setUser(u);
-            t.setTokenValue(RandomUtil.generateTokenData());
-            t.setTokenDate(LocalDate.now());
-            t.setIpAddress(request.getRemoteAddr());
-            t.setUserAgent(request.getHeader("User-Agent"));
-            return t;
-        }).orElseThrow(() -> new UsernameNotFoundException("User " + login + " was not found in the database"));
+        PersistentToken token = userRepository.findOneByLogin(login).map(
+            u -> {
+                PersistentToken t = new PersistentToken();
+                t.setSeries(RandomUtil.generateSeriesData());
+                t.setUser(u);
+                t.setTokenValue(RandomUtil.generateTokenData());
+                t.setTokenDate(LocalDate.now());
+                t.setIpAddress(request.getRemoteAddr());
+                t.setUserAgent(request.getHeader("User-Agent"));
+                return t;
+            }
+        ).orElseThrow(() -> new UsernameNotFoundException("User " + login + " was not found in the database"));
         try {
             persistentTokenRepository.saveAndFlush(token);
             addCookie(token, request, response);
-        } catch (DataAccessException e) {
+        } catch(DataAccessException e) {
             log.error("Failed to save persistent token ", e);
         }
     }
@@ -154,9 +152,9 @@ public class PersistentTokenRememberMeServices extends
                 String[] cookieTokens = decodeCookie(rememberMeCookie);
                 PersistentToken token = getPersistentToken(cookieTokens);
                 persistentTokenRepository.delete(token);
-            } catch (InvalidCookieException ice) {
+            } catch(InvalidCookieException ice) {
                 log.info("Invalid cookie, no persistent token could be deleted", ice);
-            } catch (RememberMeAuthenticationException rmae) {
+            } catch(RememberMeAuthenticationException rmae) {
                 log.debug("No persistent token found, so no token could be deleted", rmae);
             }
         }
@@ -168,14 +166,15 @@ public class PersistentTokenRememberMeServices extends
      */
     private PersistentToken getPersistentToken(String[] cookieTokens) {
         if (cookieTokens.length != 2) {
-            throw new InvalidCookieException("Cookie token did not contain " + 2 +
-                " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
+            throw new InvalidCookieException(
+                "Cookie token did not contain " + 2 + " tokens, but contained '" + Arrays.asList(cookieTokens) + "'"
+            );
         }
         String presentedSeries = cookieTokens[0];
         String presentedToken = cookieTokens[1];
         Optional<PersistentToken> optionalToken = persistentTokenRepository.findById(presentedSeries);
-        if (!optionalToken.isPresent()) {
-            // No series match, so we can't authenticate using this cookie
+        if (!optionalToken.isPresent()) {// No series match, so we can't authenticate using this cookie
+
             throw new RememberMeAuthenticationException("No persistent token found for series id: " + presentedSeries);
         }
         PersistentToken token = optionalToken.get();
@@ -184,10 +183,8 @@ public class PersistentTokenRememberMeServices extends
         if (!presentedToken.equals(token.getTokenValue())) {
             // Token doesn't match series value. Delete this session and throw an exception.
             persistentTokenRepository.delete(token);
-            throw new CookieTheftException("Invalid remember-me token (Series/token) mismatch. Implies previous " +
-                "cookie theft attack.");
+            throw new CookieTheftException("Invalid remember-me token (Series/token) mismatch. Implies previous " + "cookie theft attack.");
         }
-
         if (token.getTokenDate().plusDays(TOKEN_VALIDITY_DAYS).isBefore(LocalDate.now())) {
             persistentTokenRepository.delete(token);
             throw new RememberMeAuthenticationException("Remember-me login has expired");
@@ -196,13 +193,10 @@ public class PersistentTokenRememberMeServices extends
     }
 
     private void addCookie(PersistentToken token, HttpServletRequest request, HttpServletResponse response) {
-        setCookie(
-            new String[]{token.getSeries(), token.getTokenValue()},
-            TOKEN_VALIDITY_SECONDS, request, response);
+        setCookie(new String[] { token.getSeries(), token.getTokenValue() }, TOKEN_VALIDITY_SECONDS, request, response);
     }
 
     private static class UpgradedRememberMeToken implements Serializable {
-
         private static final long serialVersionUID = 1L;
 
         private final String[] upgradedToken;
@@ -215,11 +209,13 @@ public class PersistentTokenRememberMeServices extends
         }
 
         String getUserLoginIfValid(String[] currentToken) {
-            if (currentToken[0].equals(this.upgradedToken[0]) &&
-                    currentToken[1].equals(this.upgradedToken[1])) {
+            if (currentToken[0].equals(this.upgradedToken[0]) && currentToken[1].equals(this.upgradedToken[1])) {
                 return this.userLogin;
             }
             return null;
         }
+
     }
+
 }
+

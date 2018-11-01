@@ -2,26 +2,24 @@ package io.hackages.hackjam.config;
 
 import io.github.jhipster.config.JHipsterConstants;
 import io.github.jhipster.config.h2.H2ConfigurationHelper;
+
+import java.sql.SQLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.sql.SQLException;
-
 @Configuration
-@EnableJpaRepositories("io.hackages.hackjam.repository")
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
+@EnableJpaRepositories("io.hackages.hackjam.repository")
 @EnableTransactionManagement
 public class DatabaseConfiguration {
-
     private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
-
 
     /**
      * Open the TCP port for the H2 database, so it is available remotely.
@@ -37,3 +35,4 @@ public class DatabaseConfiguration {
     }
 
 }
+

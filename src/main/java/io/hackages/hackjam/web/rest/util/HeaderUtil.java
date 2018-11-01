@@ -8,13 +8,11 @@ import org.springframework.http.HttpHeaders;
  * Utility class for HTTP headers creation.
  */
 public final class HeaderUtil {
-
     private static final Logger log = LoggerFactory.getLogger(HeaderUtil.class);
 
     private static final String APPLICATION_NAME = "hackjamJhipsterApp";
 
-    private HeaderUtil() {
-    }
+    private HeaderUtil() {}
 
     public static HttpHeaders createAlert(String message, String param) {
         HttpHeaders headers = new HttpHeaders();
@@ -42,4 +40,6 @@ public final class HeaderUtil {
         headers.add("X-" + APPLICATION_NAME + "-params", entityName);
         return headers;
     }
+
 }
+

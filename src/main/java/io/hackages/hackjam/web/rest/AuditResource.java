@@ -1,9 +1,13 @@
 package io.hackages.hackjam.web.rest;
 
+import io.github.jhipster.web.util.ResponseUtil;
 import io.hackages.hackjam.service.AuditEventService;
 import io.hackages.hackjam.web.rest.util.PaginationUtil;
 
-import io.github.jhipster.web.util.ResponseUtil;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,17 +16,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.List;
-
 /**
  * REST controller for getting the audit events.
  */
 @RestController
 @RequestMapping("/management/audits")
 public class AuditResource {
-
     private final AuditEventService auditEventService;
 
     public AuditResource(AuditEventService auditEventService) {
@@ -50,16 +49,19 @@ public class AuditResource {
      * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of AuditEvents in body
      */
-    @GetMapping(params = {"fromDate", "toDate"})
+    @GetMapping(params = { "fromDate", "toDate" })
     public ResponseEntity<List<AuditEvent>> getByDates(
-        @RequestParam(value = "fromDate") LocalDate fromDate,
-        @RequestParam(value = "toDate") LocalDate toDate,
-        Pageable pageable) {
-
+        @RequestParam(value = "fromDate")
+        LocalDate fromDate,
+        @RequestParam(value = "toDate")
+        LocalDate toDate,
+        Pageable pageable
+    ) {
         Page<AuditEvent> page = auditEventService.findByDates(
             fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant(),
             toDate.atStartOfDay(ZoneId.systemDefault()).plusDays(1).toInstant(),
-            pageable);
+            pageable
+        );
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/management/audits");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -71,7 +73,12 @@ public class AuditResource {
      * @return the ResponseEntity with status 200 (OK) and the AuditEvent in body, or status 404 (Not Found)
      */
     @GetMapping("/{id:.+}")
-    public ResponseEntity<AuditEvent> get(@PathVariable Long id) {
+    public ResponseEntity<AuditEvent> get(
+        @PathVariable
+        Long id
+    ) {
         return ResponseUtil.wrapOrNotFound(auditEventService.find(id));
     }
+
 }
+

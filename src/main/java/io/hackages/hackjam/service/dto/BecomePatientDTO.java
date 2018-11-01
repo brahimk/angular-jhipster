@@ -7,13 +7,9 @@ import java.util.Objects;
  * A DTO for the Patient entity.
  */
 public class BecomePatientDTO implements Serializable {
+    private static final long serialVersionUID = -7435875943161134686L;
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7435875943161134686L;
-
-	private Long id;
+    private Long id;
 
     private String name;
 
@@ -23,22 +19,20 @@ public class BecomePatientDTO implements Serializable {
 
     private Boolean accepted;
 
-    
     public BecomePatientDTO() {
-		super();
-	}
-    
-	public BecomePatientDTO(Long id, String name, String location, Integer age, Boolean accepted) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.age = age;
-		this.accepted = accepted;
-	}
+        super();
+    }
 
+    public BecomePatientDTO(Long id, String name, String location, Integer age, Boolean accepted) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.age = age;
+        this.accepted = accepted;
+    }
 
-	public Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -78,7 +72,6 @@ public class BecomePatientDTO implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         BecomePatientDTO patientDTO = (BecomePatientDTO) o;
         if (patientDTO.getId() == null || getId() == null) {
             return false;
@@ -93,19 +86,18 @@ public class BecomePatientDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "PatientDTO{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            ", location='" + getLocation() + "'" +
-            ", age=" + getAge() +
-            "}";
+        return "PatientDTO{" + "id=" + getId() + ", name='" + getName() + "'" + ", location='" + getLocation() + "'" + ", age=" + getAge(
+
+        ) + "}";
     }
 
-	public Boolean isAccepted() {
-		return accepted;
-	}
+    public Boolean isAccepted() {
+        return accepted;
+    }
 
-	public void setAccepted(Boolean accepted) {
-		this.accepted = accepted;
-	}
+    public void setAccepted(Boolean accepted) {
+        this.accepted = accepted;
+    }
+
 }
+

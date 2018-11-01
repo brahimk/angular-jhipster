@@ -1,10 +1,9 @@
 package io.hackages.hackjam.domain;
 
-
-import javax.persistence.*;
-
 import java.io.Serializable;
 import java.util.Objects;
+
+import javax.persistence.*;
 
 /**
  * A Patient.
@@ -12,11 +11,10 @@ import java.util.Objects;
 @Entity
 @Table(name = "patient")
 public class Patient implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
-    @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @Id
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
@@ -31,21 +29,21 @@ public class Patient implements Serializable {
 
     @Column(name = "accepted")
     private Boolean accepted;
-        
+
     public Patient() {
-		super();
-	}
+        super();
+    }
 
-	public Patient(Long id, String name, String location, Integer age, Boolean accepted) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.age = age;
-		this.accepted = accepted;
-	}
+    public Patient(Long id, String name, String location, Integer age, Boolean accepted) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.age = age;
+        this.accepted = accepted;
+    }
 
-	// jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
+    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
     }
@@ -105,6 +103,7 @@ public class Patient implements Serializable {
     public void setAccepted(Boolean accepted) {
         this.accepted = accepted;
     }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -129,12 +128,10 @@ public class Patient implements Serializable {
 
     @Override
     public String toString() {
-        return "Patient{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            ", location='" + getLocation() + "'" +
-            ", age=" + getAge() +
-            ", accepted='" + isAccepted() + "'" +
-            "}";
+        return "Patient{" + "id=" + getId() + ", name='" + getName() + "'" + ", location='" + getLocation() + "'" + ", age=" + getAge(
+
+        ) + ", accepted='" + isAccepted() + "'" + "}";
     }
+
 }
+

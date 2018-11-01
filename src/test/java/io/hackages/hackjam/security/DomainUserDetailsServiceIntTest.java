@@ -4,6 +4,8 @@ import io.hackages.hackjam.HackjamJhipsterApp;
 import io.hackages.hackjam.domain.User;
 import io.hackages.hackjam.repository.UserRepository;
 
+import java.util.Locale;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +18,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Locale;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -29,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = HackjamJhipsterApp.class)
 @Transactional
 public class DomainUserDetailsServiceIntTest {
-
     private static final String USER_ONE_LOGIN = "test-user-one";
     private static final String USER_ONE_EMAIL = "test-user-one@localhost";
     private static final String USER_TWO_LOGIN = "test-user-two";
@@ -107,7 +106,7 @@ public class DomainUserDetailsServiceIntTest {
     @Test(expected = UsernameNotFoundException.class)
     @Transactional
     public void assertThatUserCanNotBeFoundByEmailIgnoreCase() {
-    domainUserDetailsService.loadUserByUsername(USER_TWO_EMAIL.toUpperCase(Locale.ENGLISH));
+        domainUserDetailsService.loadUserByUsername(USER_TWO_EMAIL.toUpperCase(Locale.ENGLISH));
     }
 
     @Test
@@ -125,3 +124,4 @@ public class DomainUserDetailsServiceIntTest {
     }
 
 }
+

@@ -1,14 +1,14 @@
 package io.hackages.hackjam.web.rest.errors;
 
-import org.zalando.problem.AbstractThrowableProblem;
-import org.zalando.problem.Status;
-
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BadRequestAlertException extends AbstractThrowableProblem {
+import org.zalando.problem.AbstractThrowableProblem;
+import org.zalando.problem.Status;
 
+public class BadRequestAlertException
+    extends AbstractThrowableProblem {
     private static final long serialVersionUID = 1L;
 
     private final String entityName;
@@ -39,4 +39,6 @@ public class BadRequestAlertException extends AbstractThrowableProblem {
         parameters.put("params", entityName);
         return parameters;
     }
+
 }
+

@@ -4,3 +4,5 @@
  * More information on https://github.com/zalando/problem-spring-web
  */
 package io.hackages.hackjam.web.rest.errors;
+
+

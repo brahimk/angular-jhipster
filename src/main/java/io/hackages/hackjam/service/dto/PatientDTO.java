@@ -7,13 +7,9 @@ import java.util.Objects;
  * A DTO for the Patient entity.
  */
 public class PatientDTO implements Serializable {
+    private static final long serialVersionUID = 2971323109216760636L;
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2971323109216760636L;
-
-	private Long id;
+    private Long id;
 
     private String name;
 
@@ -23,21 +19,20 @@ public class PatientDTO implements Serializable {
 
     private Boolean accepted;
 
-        
     public PatientDTO() {
-		super();
-	}
+        super();
+    }
 
-	public PatientDTO(Long id, String name, String location, Integer age, Boolean accepted) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.age = age;
-		this.accepted = accepted;
-	}
+    public PatientDTO(Long id, String name, String location, Integer age, Boolean accepted) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.age = age;
+        this.accepted = accepted;
+    }
 
-	public Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -85,7 +80,6 @@ public class PatientDTO implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         PatientDTO patientDTO = (PatientDTO) o;
         if (patientDTO.getId() == null || getId() == null) {
             return false;
@@ -100,12 +94,10 @@ public class PatientDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "PatientDTO{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            ", location='" + getLocation() + "'" +
-            ", age=" + getAge() +
-            ", accepted='" + isAccepted() + "'" +
-            "}";
+        return "PatientDTO{" + "id=" + getId() + ", name='" + getName() + "'" + ", location='" + getLocation() + "'" + ", age=" + getAge(
+
+        ) + ", accepted='" + isAccepted() + "'" + "}";
     }
+
 }
+

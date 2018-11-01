@@ -1,9 +1,9 @@
 package io.hackages.hackjam.web.rest.errors;
 
-import org.zalando.problem.AbstractThrowableProblem;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.zalando.problem.AbstractThrowableProblem;
 
 import static org.zalando.problem.Status.BAD_REQUEST;
 
@@ -21,8 +21,8 @@ import static org.zalando.problem.Status.BAD_REQUEST;
  * "error.myCustomError" :  "The server says {{param0}} to {{param1}}"
  * </pre>
  */
-public class CustomParameterizedException extends AbstractThrowableProblem {
-
+public class CustomParameterizedException
+    extends AbstractThrowableProblem {
     private static final long serialVersionUID = 1L;
 
     private static final String PARAM = "param";
@@ -32,7 +32,15 @@ public class CustomParameterizedException extends AbstractThrowableProblem {
     }
 
     public CustomParameterizedException(String message, Map<String, Object> paramMap) {
-        super(ErrorConstants.PARAMETERIZED_TYPE, "Parameterized Exception", BAD_REQUEST, null, null, null, toProblemParameters(message, paramMap));
+        super(
+            ErrorConstants.PARAMETERIZED_TYPE,
+            "Parameterized Exception",
+            BAD_REQUEST,
+            null,
+            null,
+            null,
+            toProblemParameters(message, paramMap)
+        );
     }
 
     public static Map<String, Object> toParamMap(String... params) {
@@ -51,4 +59,6 @@ public class CustomParameterizedException extends AbstractThrowableProblem {
         parameters.put("params", paramMap);
         return parameters;
     }
+
 }
+

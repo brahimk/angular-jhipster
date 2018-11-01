@@ -3,8 +3,8 @@ package io.hackages.hackjam.web.rest;
 import com.codahale.metrics.annotation.Timed;
 
 import io.hackages.hackjam.domain.PersistentToken;
-import io.hackages.hackjam.repository.PersistentTokenRepository;
 import io.hackages.hackjam.domain.User;
+import io.hackages.hackjam.repository.PersistentTokenRepository;
 import io.hackages.hackjam.repository.UserRepository;
 import io.hackages.hackjam.security.SecurityUtils;
 import io.hackages.hackjam.service.MailService;
@@ -15,18 +15,18 @@ import io.hackages.hackjam.web.rest.errors.*;
 import io.hackages.hackjam.web.rest.vm.KeyAndPasswordVM;
 import io.hackages.hackjam.web.rest.vm.ManagedUserVM;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.*;
-
 
 /**
  * REST controller for managing the current user's account.
@@ -34,7 +34,6 @@ import java.util.*;
 @RestController
 @RequestMapping("/api")
 public class AccountResource {
-
     private final Logger log = LoggerFactory.getLogger(AccountResource.class);
 
     private final UserRepository userRepository;
@@ -45,8 +44,12 @@ public class AccountResource {
 
     private final PersistentTokenRepository persistentTokenRepository;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService, PersistentTokenRepository persistentTokenRepository) {
-
+    public AccountResource(
+        UserRepository userRepository,
+        UserService userService,
+        MailService mailService,
+        PersistentTokenRepository persistentTokenRepository
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
@@ -62,9 +65,13 @@ public class AccountResource {
      * @throws LoginAlreadyUsedException 400 (Bad Request) if the login is already used
      */
     @PostMapping("/register")
-    @Timed
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    @Timed
+    public void registerAccount(
+        @RequestBody
+        @Valid
+        ManagedUserVM managedUserVM
+    ) {
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
@@ -80,7 +87,10 @@ public class AccountResource {
      */
     @GetMapping("/activate")
     @Timed
-    public void activateAccount(@RequestParam(value = "key") String key) {
+    public void activateAccount(
+        @RequestParam(value = "key")
+        String key
+    ) {
         Optional<User> user = userService.activateRegistration(key);
         if (!user.isPresent()) {
             throw new InternalServerErrorException("No user was found for this activation key");
@@ -109,9 +119,9 @@ public class AccountResource {
     @GetMapping("/account")
     @Timed
     public UserDTO getAccount() {
-        return userService.getUserWithAuthorities()
-            .map(UserDTO::new)
-            .orElseThrow(() -> new InternalServerErrorException("User could not be found"));
+        return userService.getUserWithAuthorities().map(UserDTO::new).orElseThrow(
+            () -> new InternalServerErrorException("User could not be found")
+        );
     }
 
     /**
@@ -123,8 +133,14 @@ public class AccountResource {
      */
     @PostMapping("/account")
     @Timed
-    public void saveAccount(@Valid @RequestBody UserDTO userDTO) {
-        final String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new InternalServerErrorException("Current user login not found"));
+    public void saveAccount(
+        @RequestBody
+        @Valid
+        UserDTO userDTO
+    ) {
+        final String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(
+            () -> new InternalServerErrorException("Current user login not found")
+        );
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userLogin))) {
             throw new EmailAlreadyUsedException();
@@ -133,8 +149,13 @@ public class AccountResource {
         if (!user.isPresent()) {
             throw new InternalServerErrorException("User could not be found");
         }
-        userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
-            userDTO.getLangKey(), userDTO.getImageUrl());
+        userService.updateUser(
+            userDTO.getFirstName(),
+            userDTO.getLastName(),
+            userDTO.getEmail(),
+            userDTO.getLangKey(),
+            userDTO.getImageUrl()
+        );
     }
 
     /**
@@ -145,7 +166,10 @@ public class AccountResource {
      */
     @PostMapping(path = "/account/change-password")
     @Timed
-    public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
+    public void changePassword(
+        @RequestBody
+        PasswordChangeDTO passwordChangeDto
+    ) {
         if (!checkPasswordLength(passwordChangeDto.getNewPassword())) {
             throw new InvalidPasswordException();
         }
@@ -162,9 +186,9 @@ public class AccountResource {
     @Timed
     public List<PersistentToken> getCurrentSessions() {
         return persistentTokenRepository.findByUser(
-            userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()
-                .orElseThrow(() -> new InternalServerErrorException("Current user login not found")))
-                    .orElseThrow(() -> new InternalServerErrorException("User could not be found"))
+            userRepository.findOneByLogin(
+                SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new InternalServerErrorException("Current user login not found"))
+            ).orElseThrow(() -> new InternalServerErrorException("User could not be found"))
         );
     }
 
@@ -186,14 +210,18 @@ public class AccountResource {
      */
     @DeleteMapping("/account/sessions/{series}")
     @Timed
-    public void invalidateSession(@PathVariable String series) throws UnsupportedEncodingException {
+    public void invalidateSession(
+        @PathVariable
+        String series
+    )
+        throws
+            UnsupportedEncodingException {
         String decodedSeries = URLDecoder.decode(series, "UTF-8");
-        SecurityUtils.getCurrentUserLogin()
-            .flatMap(userRepository::findOneByLogin)
-            .ifPresent(u ->
-                persistentTokenRepository.findByUser(u).stream()
-                    .filter(persistentToken -> StringUtils.equals(persistentToken.getSeries(), decodedSeries))
-                    .findAny().ifPresent(t -> persistentTokenRepository.deleteById(decodedSeries)));
+        SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneByLogin).ifPresent(
+            u -> persistentTokenRepository.findByUser(u).stream().filter(
+                persistentToken -> StringUtils.equals(persistentToken.getSeries(), decodedSeries)
+            ).findAny().ifPresent(t -> persistentTokenRepository.deleteById(decodedSeries))
+        );
     }
 
     /**
@@ -204,11 +232,11 @@ public class AccountResource {
      */
     @PostMapping(path = "/account/reset-password/init")
     @Timed
-    public void requestPasswordReset(@RequestBody String mail) {
-       mailService.sendPasswordResetMail(
-           userService.requestPasswordReset(mail)
-               .orElseThrow(EmailNotFoundException::new)
-       );
+    public void requestPasswordReset(
+        @RequestBody
+        String mail
+    ) {
+        mailService.sendPasswordResetMail(userService.requestPasswordReset(mail).orElseThrow(EmailNotFoundException::new));
     }
 
     /**
@@ -220,21 +248,24 @@ public class AccountResource {
      */
     @PostMapping(path = "/account/reset-password/finish")
     @Timed
-    public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+    public void finishPasswordReset(
+        @RequestBody
+        KeyAndPasswordVM keyAndPassword
+    ) {
         if (!checkPasswordLength(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }
-        Optional<User> user =
-            userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
-
+        Optional<User> user = userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
         if (!user.isPresent()) {
             throw new InternalServerErrorException("No user was found for this reset key");
         }
     }
 
     private static boolean checkPasswordLength(String password) {
-        return !StringUtils.isEmpty(password) &&
-            password.length() >= ManagedUserVM.PASSWORD_MIN_LENGTH &&
-            password.length() <= ManagedUserVM.PASSWORD_MAX_LENGTH;
+        return !StringUtils.isEmpty(password) && password.length() >= ManagedUserVM.PASSWORD_MIN_LENGTH && password.length(
+
+        ) <= ManagedUserVM.PASSWORD_MAX_LENGTH;
     }
+
 }
+

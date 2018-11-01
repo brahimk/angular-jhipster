@@ -1,13 +1,16 @@
 package io.hackages.hackjam.web.rest;
 
 import io.hackages.hackjam.HackjamJhipsterApp;
-
 import io.hackages.hackjam.domain.Patient;
 import io.hackages.hackjam.repository.PatientRepository;
 import io.hackages.hackjam.service.PatientService;
 import io.hackages.hackjam.service.dto.PatientDTO;
 import io.hackages.hackjam.service.mapper.PatientMapper;
 import io.hackages.hackjam.web.rest.errors.ExceptionTranslator;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +26,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import java.util.List;
-
-
 import static io.hackages.hackjam.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -41,7 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = HackjamJhipsterApp.class)
 public class PatientResourceIntTest {
-
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
@@ -59,7 +57,7 @@ public class PatientResourceIntTest {
 
     @Autowired
     private PatientMapper patientMapper;
-    
+
     @Autowired
     private PatientService patientService;
 
@@ -83,11 +81,11 @@ public class PatientResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         final PatientResource patientResource = new PatientResource(patientService);
-        this.restPatientMockMvc = MockMvcBuilders.standaloneSetup(patientResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setControllerAdvice(exceptionTranslator)
-            .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
+        this.restPatientMockMvc = MockMvcBuilders.standaloneSetup(patientResource).setCustomArgumentResolvers(
+            pageableArgumentResolver
+        ).setControllerAdvice(exceptionTranslator).setConversionService(createFormattingConversionService()).setMessageConverters(
+            jacksonMessageConverter
+        ).build();
     }
 
     /**
@@ -97,11 +95,7 @@ public class PatientResourceIntTest {
      * if they test an entity which requires the current entity.
      */
     public static Patient createEntity(EntityManager em) {
-        Patient patient = new Patient()
-            .name(DEFAULT_NAME)
-            .location(DEFAULT_LOCATION)
-            .age(DEFAULT_AGE)
-            .accepted(DEFAULT_ACCEPTED);
+        Patient patient = new Patient().name(DEFAULT_NAME).location(DEFAULT_LOCATION).age(DEFAULT_AGE).accepted(DEFAULT_ACCEPTED);
         return patient;
     }
 
@@ -117,10 +111,9 @@ public class PatientResourceIntTest {
 
         // Create the Patient
         PatientDTO patientDTO = patientMapper.toDto(patient);
-        restPatientMockMvc.perform(post("/api/patients")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(patientDTO)))
-            .andExpect(status().isCreated());
+        restPatientMockMvc.perform(
+            post("/api/patients").contentType(TestUtil.APPLICATION_JSON_UTF8).content(TestUtil.convertObjectToJsonBytes(patientDTO))
+        ).andExpect(status().isCreated());
 
         // Validate the Patient in the database
         List<Patient> patientList = patientRepository.findAll();
@@ -142,10 +135,9 @@ public class PatientResourceIntTest {
         PatientDTO patientDTO = patientMapper.toDto(patient);
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restPatientMockMvc.perform(post("/api/patients")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(patientDTO)))
-            .andExpect(status().isBadRequest());
+        restPatientMockMvc.perform(
+            post("/api/patients").contentType(TestUtil.APPLICATION_JSON_UTF8).content(TestUtil.convertObjectToJsonBytes(patientDTO))
+        ).andExpect(status().isBadRequest());
 
         // Validate the Patient in the database
         List<Patient> patientList = patientRepository.findAll();
@@ -159,16 +151,15 @@ public class PatientResourceIntTest {
         patientRepository.saveAndFlush(patient);
 
         // Get all the patientList
-        restPatientMockMvc.perform(get("/api/patients?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(patient.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-            .andExpect(jsonPath("$.[*].location").value(hasItem(DEFAULT_LOCATION.toString())))
-            .andExpect(jsonPath("$.[*].age").value(hasItem(DEFAULT_AGE)))
-            .andExpect(jsonPath("$.[*].accepted").value(hasItem(DEFAULT_ACCEPTED.booleanValue())));
+        restPatientMockMvc.perform(get("/api/patients?sort=id,desc")).andExpect(status().isOk()).andExpect(
+            content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        ).andExpect(jsonPath("$.[*].id").value(hasItem(patient.getId().intValue()))).andExpect(
+            jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString()))
+        ).andExpect(jsonPath("$.[*].location").value(hasItem(DEFAULT_LOCATION.toString()))).andExpect(
+            jsonPath("$.[*].age").value(hasItem(DEFAULT_AGE))
+        ).andExpect(jsonPath("$.[*].accepted").value(hasItem(DEFAULT_ACCEPTED.booleanValue())));
     }
-    
+
     @Test
     @Transactional
     public void getPatient() throws Exception {
@@ -176,22 +167,20 @@ public class PatientResourceIntTest {
         patientRepository.saveAndFlush(patient);
 
         // Get the patient
-        restPatientMockMvc.perform(get("/api/patients/{id}", patient.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(patient.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
-            .andExpect(jsonPath("$.location").value(DEFAULT_LOCATION.toString()))
-            .andExpect(jsonPath("$.age").value(DEFAULT_AGE))
-            .andExpect(jsonPath("$.accepted").value(DEFAULT_ACCEPTED.booleanValue()));
+        restPatientMockMvc.perform(get("/api/patients/{id}", patient.getId())).andExpect(status().isOk()).andExpect(
+            content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        ).andExpect(jsonPath("$.id").value(patient.getId().intValue())).andExpect(
+            jsonPath("$.name").value(DEFAULT_NAME.toString())
+        ).andExpect(jsonPath("$.location").value(DEFAULT_LOCATION.toString())).andExpect(jsonPath("$.age").value(DEFAULT_AGE)).andExpect(
+            jsonPath("$.accepted").value(DEFAULT_ACCEPTED.booleanValue())
+        );
     }
 
     @Test
     @Transactional
     public void getNonExistingPatient() throws Exception {
         // Get the patient
-        restPatientMockMvc.perform(get("/api/patients/{id}", Long.MAX_VALUE))
-            .andExpect(status().isNotFound());
+        restPatientMockMvc.perform(get("/api/patients/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -206,17 +195,12 @@ public class PatientResourceIntTest {
         Patient updatedPatient = patientRepository.findById(patient.getId()).get();
         // Disconnect from session so that the updates on updatedPatient are not directly saved in db
         em.detach(updatedPatient);
-        updatedPatient
-            .name(UPDATED_NAME)
-            .location(UPDATED_LOCATION)
-            .age(UPDATED_AGE)
-            .accepted(UPDATED_ACCEPTED);
+        updatedPatient.name(UPDATED_NAME).location(UPDATED_LOCATION).age(UPDATED_AGE).accepted(UPDATED_ACCEPTED);
         PatientDTO patientDTO = patientMapper.toDto(updatedPatient);
 
-        restPatientMockMvc.perform(put("/api/patients")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(patientDTO)))
-            .andExpect(status().isOk());
+        restPatientMockMvc.perform(
+            put("/api/patients").contentType(TestUtil.APPLICATION_JSON_UTF8).content(TestUtil.convertObjectToJsonBytes(patientDTO))
+        ).andExpect(status().isOk());
 
         // Validate the Patient in the database
         List<Patient> patientList = patientRepository.findAll();
@@ -237,10 +221,9 @@ public class PatientResourceIntTest {
         PatientDTO patientDTO = patientMapper.toDto(patient);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restPatientMockMvc.perform(put("/api/patients")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(patientDTO)))
-            .andExpect(status().isBadRequest());
+        restPatientMockMvc.perform(
+            put("/api/patients").contentType(TestUtil.APPLICATION_JSON_UTF8).content(TestUtil.convertObjectToJsonBytes(patientDTO))
+        ).andExpect(status().isBadRequest());
 
         // Validate the Patient in the database
         List<Patient> patientList = patientRepository.findAll();
@@ -256,9 +239,9 @@ public class PatientResourceIntTest {
         int databaseSizeBeforeDelete = patientRepository.findAll().size();
 
         // Get the patient
-        restPatientMockMvc.perform(delete("/api/patients/{id}", patient.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
-            .andExpect(status().isOk());
+        restPatientMockMvc.perform(delete("/api/patients/{id}", patient.getId()).accept(TestUtil.APPLICATION_JSON_UTF8)).andExpect(
+            status().isOk()
+        );
 
         // Validate the database is empty
         List<Patient> patientList = patientRepository.findAll();
@@ -302,4 +285,6 @@ public class PatientResourceIntTest {
         assertThat(patientMapper.fromId(42L).getId()).isEqualTo(42);
         assertThat(patientMapper.fromId(null)).isNull();
     }
+
 }
+

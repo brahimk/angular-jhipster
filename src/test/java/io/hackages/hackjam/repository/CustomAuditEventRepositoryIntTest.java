@@ -4,6 +4,14 @@ import io.hackages.hackjam.HackjamJhipsterApp;
 import io.hackages.hackjam.config.Constants;
 import io.hackages.hackjam.config.audit.AuditEventConverter;
 import io.hackages.hackjam.domain.PersistentAuditEvent;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +23,6 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.HttpSession;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.hackages.hackjam.repository.CustomAuditEventRepository.EVENT_DATA_COLUMN_MAX_LENGTH;
@@ -34,7 +36,6 @@ import static io.hackages.hackjam.repository.CustomAuditEventRepository.EVENT_DA
 @SpringBootTest(classes = HackjamJhipsterApp.class)
 @Transactional
 public class CustomAuditEventRepositoryIntTest {
-
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
@@ -163,3 +164,4 @@ public class CustomAuditEventRepositoryIntTest {
     }
 
 }
+
