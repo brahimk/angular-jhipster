@@ -8,7 +8,12 @@ import java.util.Objects;
  */
 public class BecomePatientDTO implements Serializable {
 
-    private Long id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7435875943161134686L;
+
+	private Long id;
 
     private String name;
 
@@ -80,4 +85,12 @@ public class BecomePatientDTO implements Serializable {
             ", age=" + getAge() +
             "}";
     }
+
+	public Boolean getAccepted() {
+		return accepted;
+	}
+
+	public void setAccepted(Boolean accepted) {
+		this.accepted = accepted;
+	}
 }

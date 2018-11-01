@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BecomePatientService } from 'app/appointment/become-patient.service';
+import { HttpResponse } from '@angular/common/http';
+import { map, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'jhi-home',
@@ -12,11 +15,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
                 <h1 class="display-4">Welcome, Hipster!</h1>
                 <p class="lead">This is the become a patient, please fill the form below to join my hospital </p>
 
-                <form name="becomePatient" role="form" novalidate formGroup="becomePatientForm">
+                <form name="becomePatient" role="form" novalidate [formGroup]="becomePatientForm">
                     <h2 id="jhi-patient-heading">Become a Patient</h2>
                     <div>
                         <jhi-alert-error></jhi-alert-error>
-                        <div ngIf="isSuccess" class="alert alert-success" role="alert">
+                        <div *ngIf="isSuccess" class="alert alert-success" role="alert">
                             This is a success! The doctor will check it ASAP
                         </div>
                         <div class="form-group">
@@ -37,11 +40,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
                     </div>
                     <div>
                         <button type="button" id="cancel-save" class="btn btn-secondary"
-                                click="reset()">
+                                (click)="reset()">
                             <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Reset</span>
                         </button>
                         <button type="submit" id="save-entity"
-                                (click)="save"
+                                (click)="save()"
                                 [disabled]="becomePatientForm.invalid || isSaving"
                                 class="btn btn-primary">
                             <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
@@ -60,7 +63,7 @@ export class BecomePatientComponent implements OnInit {
     isSaving = false;
     isSuccess = false;
 
-    constructor(private fb: FormBuilder) {}
+    constructor(private fb: FormBuilder, private becomePatientService: BecomePatientService) {}
 
     ngOnInit() {
         this.becomePatientForm = this.fb.group({
@@ -77,7 +80,17 @@ export class BecomePatientComponent implements OnInit {
     }
 
     save() {
+        debugger;
         this.isSaving = true;
+        this.becomePatientService.save(this.becomePatientForm.getRawValue()).pipe(
+            map(response => {
+                // to get a new csrf token call the api
+                console.log('Je suis un super !!');
+                return response;
+            }),
+            catchError(val => `I caught: ${val}`)
+        );
+
         /**
          * Inject BecomePatientService and save the patient
          */

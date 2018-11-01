@@ -8,6 +8,8 @@ import io.hackages.hackjam.service.dto.PatientDTO;
 import io.hackages.hackjam.service.mapper.PatientMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,11 +27,18 @@ public class PatientServiceImpl implements PatientService {
 
     private final Logger log = LoggerFactory.getLogger(PatientServiceImpl.class);
 
-    private final PatientRepository patientRepository;
+    @Autowired
+    @Qualifier("patientRepository")
+    private PatientRepository patientRepository;
 
-    private final PatientMapper patientMapper;
+    private PatientMapper patientMapper;
 
-    public PatientServiceImpl(PatientRepository patientRepository, PatientMapper patientMapper) {
+    
+    public PatientServiceImpl() {
+		super();
+	}
+
+	public PatientServiceImpl(PatientRepository patientRepository, PatientMapper patientMapper) {
         this.patientRepository = patientRepository;
         this.patientMapper = patientMapper;
     }

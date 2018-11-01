@@ -50,7 +50,17 @@ public class PatientResource {
     @PostMapping("/become-patient")
     @Timed
     public ResponseEntity<PatientDTO> becomePatient(@RequestBody BecomePatientDTO becomePatientDTO) throws URISyntaxException {
-        throw new NotImplementedException();
+        if (becomePatientDTO == null || becomePatientDTO.getName() == null || becomePatientDTO.getLocation() == null 
+        		|| becomePatientDTO.getAge() == null ) {
+            throw new BadRequestAlertException("Invalid name, or location or age of ", ENTITY_NAME, " null");
+        }
+        
+        PatientDTO result = patientService.save(becomePatientDTO);
+        return ResponseEntity.created(new URI("/api/patients/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+            .body(result);
+        
+    	//throw new NotImplementedException();
     }
 
     /**

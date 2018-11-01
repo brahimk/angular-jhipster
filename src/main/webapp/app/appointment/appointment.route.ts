@@ -3,7 +3,7 @@ import { Route } from '@angular/router';
 import { BecomePatientComponent } from './';
 
 export const BECOME_PATIENT_ROUTE: Route = {
-    path: '/become-patient',
+    path: 'become-patient',
     component: BecomePatientComponent,
     data: {
         authorities: [],

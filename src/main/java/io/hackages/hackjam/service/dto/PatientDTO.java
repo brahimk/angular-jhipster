@@ -8,7 +8,12 @@ import java.util.Objects;
  */
 public class PatientDTO implements Serializable {
 
-    private Long id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2971323109216760636L;
+
+	private Long id;
 
     private String name;
 
